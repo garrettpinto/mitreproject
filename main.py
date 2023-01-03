@@ -13,19 +13,18 @@ Techniques sheet
 - each Group
 
 Project start date: 12-15-2022
-"""
 
+"""
 import requests
 from bs4 import BeautifulSoup
 from operator import itemgetter
 
-# results_exp = [
-#     {"APT123": {"ttps": [], "software": []}},
-#     {"ATP129": {"ttps": [], "software": []}}
-# ]
-
-
-# Create function to retrieve respective URLs for Mitre Groups
+results_exp = [
+    {"ATP123": {"ttps": [], "software": []}},
+    {"ATP129": {"ttps": [], "software": []}},
+    {"ATP500": {"ttps": [], "software": []}}
+]
+# Create functions to retrieve respective URLs for Mitre Groups and Software
 def get_group_urls():
     # Retrieve the HTML from the Mitre webpage
     url = "https://attack.mitre.org/groups/"
@@ -35,36 +34,24 @@ def get_group_urls():
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # List each group from "Groups" page sidebar
-    groups_sidebar = soup.findAll('div', class_='sidenav')
+    Groups_sidebar = soup.findAll('div', class_='sidenav')
 
     # Assign empty list to populate multiple dictionaries with "Threat Actor" and "url" keys.
     list_dicts_groups_and_urls = []
 
-    # Loop through all group names in Group sidebar...fix: ignore "side-nav-mobile-view"
-    for group in groups_sidebar:
-
-        # # Check the id attribute of the div element
-        # if group.div["class"] == "side-nav-desktop-view h-100":
-        #     # Skip the rest of the loop iteration if the id is side-nav-mobile-view
-        #     continue
-
-            # "actor" variable that 'removes' duplication on Mitre page...need to fix for "Threat Group-, etc."
+    # Loop through all group names in Group sidebar
+    for group in Groups_sidebar:
         actor = group.div["id"].split("-")[0]
-        # "url" variable that returns group url
         url = group.a['href']
-        
-        # skips "Overview" on sidebar and else continues through rest of sidebar list
         if actor == "0":
             pass
         else:
             list_dicts_groups_and_urls.append({"Threat Actor": actor, "url": ("https://attack.mitre.org" + url)})
-    
     return list_dicts_groups_and_urls
 
-# Create function to populate results list with dictionaries containing ttps and software keys with their respective values
 def get_groups_info(threat_actor_dict_list):
-    
-    actor_results = []
+    results = []
+
     for dic in threat_actor_dict_list:
 
         url = dic["url"]
@@ -120,19 +107,20 @@ def get_groups_info(threat_actor_dict_list):
             else:
                 print("extra/unknown table")
 
-        actor_results.append(actor_result_dict)
+        results.append(actor_result_dict)
     
 
-    return actor_results
+    return results
 
 
-# # Not needed??
+
 # list_dicts_groups_and_urls = get_group_urls()
+
 
 # ttps = get_groups_info(list_dicts_groups_and_urls)
 
 
-# print()
+print()
 
 def get_software_urls():
     # Retrieve the HTML from the Mitre webpage
